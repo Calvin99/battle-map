@@ -15,13 +15,7 @@ sizeNumber.set("s", 10);
 sizeNumber.set("m", 15);
 sizeNumber.set("l", 30);
 sizeNumber.set("h", 45);
-
-var sizeName = new Map();
-sizeNumber.set("t", 5);
-sizeNumber.set("s", 10);
-sizeNumber.set("m", 15);
-sizeNumber.set("l", 30);
-sizeNumber.set("h", 45);
+sizeNumber.set("g", 65);
 
 function Creature(x, y, color, name, size) {
     this.x = x;
@@ -135,6 +129,28 @@ Creature.prototype.draw = function() {
             ctx.lineTo(this.x + 37.5, this.y + 52.5);
             ctx.stroke();
         }
+        else if (this.size == "g") {
+            ctx.beginPath();
+            ctx.moveTo(this.x - 70, this.y - 50);
+            ctx.lineTo(this.x - 70, this.y - 70);
+            ctx.lineTo(this.x - 50, this.y - 70);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(this.x - 70, this.y + 50);
+            ctx.lineTo(this.x - 70, this.y + 70);
+            ctx.lineTo(this.x - 50, this.y + 70);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(this.x + 70, this.y - 50);
+            ctx.lineTo(this.x + 70, this.y - 70);
+            ctx.lineTo(this.x + 50, this.y - 70);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(this.x + 70, this.y + 50);
+            ctx.lineTo(this.x + 70, this.y + 70);
+            ctx.lineTo(this.x + 50, this.y + 70);
+            ctx.stroke();
+        }
     }
     ctx.fillStyle = this.color;
     ctx.beginPath();
@@ -146,7 +162,7 @@ Creature.prototype.align = function() {
     if (this.size == "t") {
         this.xGoal = Math.round((this.x - 8.75) / 17.5) * 17.5 + 8.75;
         this.yGoal = Math.round((this.y - 8.75) / 17.5) * 17.5 + 8.75;
-    } else if (this.size == "l") {
+    } else if (this.size == "l" || this.size == "g") {
         this.xGoal = Math.round(this.x / 35) * 35;
         this.yGoal = Math.round(this.y / 35) * 35;
     } else {
@@ -156,7 +172,7 @@ Creature.prototype.align = function() {
 }
 
 Creature.prototype.update = function() {
-    if (this.x != this.xGoal) {
+    if (this.x != this.xGoal || this.y != this.yGoal) {
         this.x -= 5 * Math.cos(Math.atan2(this.y - this.yGoal, this.x - this.xGoal));
         this.y -= 5 * Math.sin(Math.atan2(this.y - this.yGoal, this.x - this.xGoal));
         if (Math.pow(Math.pow(this.x - this.xGoal, 2) + Math.pow(this.y - this.yGoal, 2), 0.5) < 3) {
@@ -212,7 +228,6 @@ function draw() {
 
     //Draw creatures
     for (i = 0; i < players.length; i++) {
-        players[i].draw();
         if (players[i].held) {
             players[i].x = mouseX - xShift;
             players[i].y = mouseY - yShift;
@@ -220,7 +235,9 @@ function draw() {
         } else {
             players[i].update();
         }
+        players[i].draw();
     }
+    if (selected != null) players[selected].draw();
 }
 
 document.onmousemove = function(e) {
