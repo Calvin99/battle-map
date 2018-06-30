@@ -1,0 +1,15 @@
+<body height="4800">
+    <canvas id="map" width="700" height="700" style=" float: left; top:0; left:0 margin-right: 20;"></canvas>
+    <div id="creatureStats" style="display: block; background-color : #888; position fixed;" width="200" height="700">
+        <h1 id="name">None selected</h1>
+        <h2>Size:</h2>
+        <select id = size onchange="players[selected].resize();" style="/*float: left;*/">
+          <option value="t">Tiny</option>
+          <option value="s">Small</option>
+          <option value="m">Medium</option>
+          <option value="l">Large</option>
+          <option value="h">Huge</option>
+        </select>
+    </div>
+    <script src="js/map.js"></script>
+</body>
