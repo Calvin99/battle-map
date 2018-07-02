@@ -8,6 +8,12 @@ var mouseX = null,
  
 var xShift = 0,
 	yShift = 0;
+	
+var hover = false;
+	
+var mode = "move";
+
+var brush = false;
 
 var sizeNumber = new Map();
 sizeNumber.set("t", 5);
@@ -28,6 +34,7 @@ function Creature(x, y, color, name, size) {
     this.rGoal = sizeNumber.get(this.size);
     this.color = color;
     this.name = name;
+    this.notes = "";
     this.selected = false;
     this.held = false;
 }
@@ -41,6 +48,7 @@ Creature.prototype.draw = function() {
     }
     if (this.selected) {
         ctx.strokeStyle = "white";
+        ctx.lineWidth = 2;
         if (this.size == "t") {
             ctx.beginPath();
             ctx.moveTo(this.x - 8.75, this.y - 5.75);
@@ -186,8 +194,10 @@ Creature.prototype.update = function() {
 }
 
 Creature.prototype.display = function() {
-	document.getElementById("name").innerHTML = this.name;
+	document.getElementById("name").value = this.name;
 	document.getElementById("size").value = this.size;
+	document.getElementById("color").value = this.color;
+	document.getElementById("notes").value = this.notes;
 }
 
 Creature.prototype.resize = function() {
@@ -196,15 +206,49 @@ Creature.prototype.resize = function() {
     this.align();
 }
 
+Creature.prototype.recolor = function() {
+	this.color = document.getElementById('color').value;
+}
+
 var test1 = new Creature(332.5, 332.5, "red", "Player 1", "m");
-var test2 = new Creature(367.5, 332.5, "green", "Player 2", "m");
+var test2 = new Creature(367.5, 332.5, "lime", "Player 2", "m");
 var test3 = new Creature(332.5, 367.5, "blue", "Player 3", "m");
 var test4 = new Creature(367.5, 367.5, "yellow", "Player 4", "m");
 
 var players = [test1, test2, test3, test4];
 
+function addCreature () {
+	players[players.length] = new Creature(17.5, 17.5, "red", "New Creature", "m");
+}
+
+function deleteCreature () {
+	players.splice(selected,1);
+	if (selected == players.length) selected--;
+}
+
 var selected = null;
 var held = null;
+
+function swapMode() {
+	if (mode == "move") {
+		if (selected != null) players[selected].selected = false;
+		selected = null;
+		document.getElementById("name").value = "None selected";
+		document.getElementById("size").value = "t";
+		document.getElementById("color").value = "white";
+		document.getElementById("notes").innerHTML = "";
+		mode = "paint";
+		document.getElementById("mode").innerHTML = "Mode: Paint";
+		document.getElementById("modeButton").innerHTML = "Mode Mode";
+	} else {
+		mode = "move";
+		brush = false;
+		document.getElementById("mode").innerHTML = "Mode: Move";
+		document.getElementById("modeButton").innerHTML = "Paint Mode";
+	}
+}
+
+var paint = [];
 
 setInterval(draw, 40);
 
@@ -212,9 +256,18 @@ function draw() {
     //Draw background
     ctx.fillStyle = "#555";
     ctx.fillRect(0, 0, 700, 700);
+    
+    //Paint
+    for (i = 0; i < paint.length; i++) {
+        ctx.fillStyle = paint[i][3];
+        ctx.beginPath();
+        ctx.arc(paint[i][0], paint[i][1], paint[i][2], Math.PI * 2, false);
+        ctx.fill();
+    }
 
     //Draw grid
     ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
     for (i = 0; i < 19; i++) {
         ctx.beginPath();
         ctx.moveTo(0, 35 + i * 35);
@@ -246,32 +299,58 @@ document.onmousemove = function(e) {
     rect = canvas.getBoundingClientRect();
     mouseX = Math.round((e.clientX - rect.left));
     mouseY = Math.round((e.clientY - rect.top));
+    
+    if (mode == "paint" && brush) {
+    	paint[paint.length] = [mouseX, mouseY, document.getElementById("paintSize").value, document.getElementById("paintColor").value];
+    }
 }
 
 document.onmousedown = function(e) {
     e = window.event || e;
-
-    for (i = 0; i < players.length; i++) {
-        if (Math.pow(Math.pow(mouseX - players[i].x, 2) + Math.pow(mouseY - players[i].y, 2), 0.5) < players[i].r) {
-            if (selected != null) players[selected].selected = false;
-            players[i].selected = true;
-            players[i].held = true;
-            players[i].display();
-            selected = i;
-            held = i;
-            xShift = mouseX - players[i].x;
-            yShift = mouseY - players[i].y;
-            break;
-        }
+	
+	if (hover) {
+		if (mode == "move") {
+			var playerClicked = false;
+			for (i = 0; i < players.length; i++) {
+				if (Math.pow(Math.pow(mouseX - players[i].x, 2) + Math.pow(mouseY - players[i].y, 2), 0.5) < players[i].r) {
+					if (selected != null) players[selected].selected = false;
+					players[i].selected = true;
+					players[i].held = true;
+					players[i].display();
+					selected = i;
+					held = i;
+					xShift = mouseX - players[i].x;
+					yShift = mouseY - players[i].y;
+					playerClicked = true;
+					break;
+				}
+			}
+			if (!playerClicked) {
+				players[selected].selected = false;
+				selected = null;
+				document.getElementById("name").value = "None selected";
+				document.getElementById("size").value = "t";
+				document.getElementById("color").value = "white";
+				document.getElementById("notes").innerHtml = "";
+			}
+		} else {
+			brush = true;
+		}
     }
 }
 
 document.onmouseup = function(e) {
     e = window.event || e;
 
-    if (held != null) {
-        players[held].align();
-        players[held].held = false;
-        held = null;
+	if (hover) {
+		if (mode == "move") {
+			if (held != null) {
+				players[held].align();
+				players[held].held = false;
+				held = null;
+			}
+		} else {
+			brush = false;
+		}
     }
 }

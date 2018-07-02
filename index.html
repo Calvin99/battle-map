@@ -1,16 +1,76 @@
-<body height="4800">
-    <canvas id="map" width="700" height="700" style=" float: left; top:0; left:0 margin-right: 20;"></canvas>
-    <div id="creatureStats" style="display: block; background-color : #888; position fixed;" width="200" height="700">
-        <h1 id="name">None selected</h1>
-        <h2>Size:</h2>
-        <select id = size onchange="players[selected].resize();" style="/*float: left;*/">
-          <option value="t">Tiny</option>
-          <option value="s">Small</option>
-          <option value="m">Medium</option>
-          <option value="l">Large</option>
-          <option value="h">Huge</option>
-          <option value="g">Gargantuan</option>
-        </select>
-    </div>
-    <script src="js/map.js"></script>
-</body>
+<html>
+	<head>
+		<title>D&D Battle Map</title>
+	</head>
+	<body height="4800">
+		<canvas id="map" width="700" height="700" onmouseover="hover = true;" onmouseleave="hover = false;" style=" float: left; top:0; left:0 margin-right: 20;"></canvas>
+		<div id="creatureStats" style="display: block; background-color : #888; position fixed;" width="200">
+			<h2>Selected</h2>
+			<h3>Name:</h3>
+			<input type="text" id="name" value="None selected" onchange="players[selected].name = document.getElementById('name').value;" style="font-size: 18px;"></input>
+			<h3>Size:</h3>
+			<select id = "size" onchange="players[selected].resize();">
+			  <option value="t">Tiny</option>
+			  <option value="s">Small</option>
+			  <option value="m">Medium</option>
+			  <option value="l">Large</option>
+			  <option value="h">Huge</option>
+			  <option value="g">Gargantuan</option>
+			</select>
+			<h3>Color:</h3>
+			<select id = "color" onchange="players[selected].recolor();"">
+			  <option value="white">White</option>
+			  <option value="silver">Silver</option>
+			  <option value="grey">Grey</option>
+			  <option value="black">Black</option>
+			  <option value="red">Red</option>
+			  <option value="maroon">Maroon</option>
+			  <option value="orange">Orange</option>
+			  <option value="yellow">Yellow</option>
+			  <option value="olive">Olive</option>
+			  <option value="lime">Lime</option>
+			  <option value="green">Green</option>
+			  <option value="aqua">Aqua</option>
+			  <option value="teal">Teal</option>
+			  <option value="blue">Blue</option>
+			  <option value="navy">Navy</option>
+			  <option value="fuchsia">Fuchsia</option>
+			  <option value="purple">Purple</option>
+			</select>
+			<h3>Notes:</h3>
+			<textarea id="notes" rows="3" cols="30" onchange="players[selected].notes = document.getElementById('notes').innerHTML;"></textarea>
+			<br/><br/>
+			<button onclick="addCreature()">Add Creature</button>
+			<button onclick="deleteCreature()">Remove Selected</button>
+			<br/>
+			<h2 id="mode">Mode: Move</h2>
+			<button onclick="swapMode()" id="modeButton">Paint Mode</button>
+			<h3>Paint Color:</h3>
+			<select id="paintColor">
+			  <option value="white">White</option>
+			  <option value="silver">Silver</option>
+			  <option value="grey">Grey</option>
+			  <option value="black">Black</option>
+			  <option value="red">Red</option>
+			  <option value="maroon">Maroon</option>
+			  <option value="orange">Orange</option>
+			  <option value="yellow">Yellow</option>
+			  <option value="olive">Olive</option>
+			  <option value="lime">Lime</option>
+			  <option value="green">Green</option>
+			  <option value="aqua">Aqua</option>
+			  <option value="teal">Teal</option>
+			  <option value="blue">Blue</option>
+			  <option value="navy">Navy</option>
+			  <option value="fuchsia">Fuchsia</option>
+			  <option value="purple">Purple</option>
+			  <option value="#555">Erase</option>
+			</select>
+			<h3>Paint Size:</h3>
+			<input type="range" id="paintSize" min="1" max="20" value="5" step="1"/>
+			<br/><br/>
+			<button onclick="paint = []">Clear Paint</button>
+		</div>
+		<script src="js/map.js"></script>
+	</body>
+</html>
